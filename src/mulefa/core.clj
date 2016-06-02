@@ -16,11 +16,23 @@
   (map eval-test-with-state state))
 
 (defn- run-transition
-  [state transition])
+  [driver state transition]
+  ;; TODO get check-state response and fail out properly
+  ;; i.e. no more (do)
+  (do
+    (println "running-transition")
+    (check-state driver state)
+    (map (partial eval-with-driver driver) transition)))
 
 (defn- run-route
-  [[state transition the-rest]]
-  (run-transition state transition))
+  ([arg-list]
+   (println "run route1")
+   (run-route arg-list (t/new-driver {:browser :firefox})))
+  ([[state transition & the-rest] driver]
+   (println "run route2")
+   (run-transition driver state transition)
+   (when the-rest
+     (recur the-rest driver))))
 
 (defn- get-routes
   [graph start-state]
