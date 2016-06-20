@@ -49,17 +49,14 @@
     (t/submit driver (select sel))))
 
 ;; internal graph running
-(defn- eval-with-driver
-  [driver function]
-  (function driver))
 
 (defn- check-state
   [driver state]
   (let [_         (println "checking state")
         ;new-state (filter #(not= (first %) 'url) state)
         url-to-go  "https://www.wiktionary.org/" #_(first (filter #(= (first %) 'url) state))]
-    (when url-to-go (eval-with-driver driver (url url-to-go)))
-    (map (partial eval-with-driver driver) state)))
+    (when url-to-go ((url url-to-go) driver))
+    (map #(% driver) state)))
 
 (defn- run-transition
   [driver state transition]
@@ -68,7 +65,7 @@
   (do
     (println "running-transition")
     (check-state driver state)
-    (map (partial eval-with-driver driver) transition)))
+    (map #(% driver) transition)))
 
 (defn run-route
   ([arg-list]
