@@ -16,18 +16,18 @@
   nil"
   [f]
   (fn [& args]
-    (fn []
-      (apply f args))))
+    (fn [driver]
+      (apply f (concat [driver] args)))))
 
 (defn- select
-  [driver selector]
-  (fn []
+  [selector]
+  (fn [driver]
     (first (t/find-element driver {:css selector}))))
 
 ;; state checking
 (defn url?
-  [driver string]
-  (fn []
+  [string]
+  (fn [driver]
     (= (t/current-url driver) string)))
 
 
@@ -39,27 +39,27 @@
 (def url (pass-on t/to))
 
 (defn fill-in
-  [driver sel val]
-  (fn []
+  [sel val]
+  (fn [driver]
     (t/input-text driver (select sel) val)))
 
 (defn submit
-  [driver sel]
-  (fn []
+  [sel]
+  (fn [driver]
     (t/submit driver (select sel))))
 
 ;; internal graph running
 (defn- eval-with-driver
-  [driver [function & args :as test]]
-  ((concat (list function driver) args)))
+  [driver function]
+  (function driver))
 
 (defn- check-state
   [driver state]
   (let [_         (println "checking state")
-        new-state (filter #(not= (first %) 'url) state)
-        url-to-go (first (filter #(= (first %) 'url) state))]
-    (when url-to-go (eval-with-driver driver url-to-go))
-    (map (partial eval-with-driver driver) new-state)))
+        ;new-state (filter #(not= (first %) 'url) state)
+        url-to-go  "https://www.wiktionary.org/" #_(first (filter #(= (first %) 'url) state))]
+    (when url-to-go (eval-with-driver driver (url url-to-go)))
+    (map (partial eval-with-driver driver) state)))
 
 (defn- run-transition
   [driver state transition]
@@ -70,7 +70,7 @@
     (check-state driver state)
     (map (partial eval-with-driver driver) transition)))
 
-(defn- run-route
+(defn run-route
   ([arg-list]
    (println "run route1")
    (run-route arg-list (t/new-driver {:browser :firefox})))
