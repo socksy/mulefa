@@ -64,7 +64,7 @@
   (do
     (println "running-transition")
     (check-state driver state)
-    (map #(% driver) transition)))
+    (doall (map #(% driver) transition))))
 
 (defn run-route
   ([arg-list]
@@ -78,10 +78,10 @@
 
 (defn- get-routes
   [graph start-state]
-  ;;TODO
-  (first graph))
+  ;;TODO actually get possible paths from the graph
+  graph)
 
 (defn run
   [graph start-state]
   (->> (get-routes graph start-state)
-       (map run-route)))
+       (run! run-route)))

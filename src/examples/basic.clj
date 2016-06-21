@@ -27,8 +27,8 @@
     (m/value?  "#firstHeading" "happy")})
 
 (def graph ^:m-graph
-  #{'(start search-for-flocci flocci-state)
-    '(start search-for-happy  happy-state)})
+  #{[start search-for-flocci flocci-state]
+    [start search-for-happy  happy-state]})
 
 (defn -main
   []
