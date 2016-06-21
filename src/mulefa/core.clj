@@ -19,12 +19,8 @@
     (fn [driver]
       (apply f (concat [driver] args)))))
 
-(defn- select
-  [selector]
-  (fn [driver]
-    (first (t/find-element driver {:css selector}))))
-
 ;; state checking
+
 (defn url?
   [string]
   (fn [driver]
@@ -35,17 +31,18 @@
 (def value? (pass-on t/visible?))
 
 ;; transitions
+
 (def url (pass-on t/to))
 
 (defn fill-in
   [sel val]
   (fn [driver]
-    (t/input-text driver (select sel) val)))
+    (t/input-text driver sel val)))
 
 (defn submit
   [sel]
   (fn [driver]
-    (t/submit driver (select sel))))
+    (t/submit driver sel)))
 
 ;; internal graph running
 
