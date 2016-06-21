@@ -30,7 +30,6 @@
   (fn [driver]
     (= (t/current-url driver) string)))
 
-
 (def exists? (pass-on t/exists?))
 
 (def value? (pass-on t/visible?))
@@ -70,12 +69,12 @@
 (defn run-route
   ([arg-list]
    (println "run route1")
-   (run-route arg-list (t/new-driver {:browser :firefox})))
-  ([[state transition & the-rest] driver]
+   (run-route (t/new-driver {:browser :chrome}) arg-list))
+  ([driver [state transition & the-rest]]
    (println "run route2")
    (run-transition driver state transition)
    (when the-rest
-     (recur the-rest driver))))
+     (recur driver the-rest))))
 
 (defn- get-routes
   [graph start-state]
