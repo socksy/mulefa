@@ -28,11 +28,14 @@
 
 (def exists? (pass-on t/exists?))
 
-(def value? (pass-on t/visible?))
+(defn value?
+  [sel expected-val]
+  (fn [driver]
+    (= (t/value driver sel) expected-val)))
 
 ;; transitions
 
-(def url (pass-on t/to))
+(def navigate (pass-on t/to))
 
 (defn fill-in
   [sel val]
@@ -48,37 +51,34 @@
 
 (defn- check-state
   [driver state]
-  (let [_         (println "checking state")
-        ;new-state (filter #(not= (first %) 'url) state)
-        url-to-go  "https://www.wiktionary.org/" #_(first (filter #(= (first %) 'url) state))]
-    (when url-to-go ((url url-to-go) driver))
-    (map #(% driver) state)))
+  (println "checking state")
+  (doall (map #(% driver) state)))
 
 (defn- run-transition
-  [driver state transition]
+  [driver transition next-state]
   ;; TODO get check-state response and fail out properly
   ;; i.e. no more (do)
   (do
     (println "running-transition")
-    (check-state driver state)
-    (doall (map #(% driver) transition))))
+    (doall (map #(% driver) transition))
+    (check-state driver next-state)))
 
 (defn run-route
   ([arg-list]
    (println "run route1")
    (run-route (t/new-driver {:browser :chrome}) arg-list))
-  ([driver [state transition & the-rest]]
+  ([driver [transition next-state & the-rest]]
    (println "run route2")
-   (run-transition driver state transition)
+   (run-transition driver transition next-state)
    (when the-rest
      (recur driver the-rest))))
 
 (defn- get-routes
-  [graph start-state]
+  [graph starting-point]
   ;;TODO actually get possible paths from the graph
   graph)
 
 (defn run
-  [graph start-state]
-  (->> (get-routes graph start-state)
+  [graph starting-point]
+  (->> (get-routes graph starting-point)
        (run! run-route)))

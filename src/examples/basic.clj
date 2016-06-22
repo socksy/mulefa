@@ -3,7 +3,10 @@
 
 ;; attempt v.0.0.2
 
-(def start ^:m-state
+(def set-up ^:m-transaction
+  [(m/navigate "https://www.wiktionary.org/")])
+
+(def initial ^:m-state
   #{;'(m/url     "https://www.wiktionary.org/")
     (m/exists? "#searchInput")
     (m/url?    "https://www.wiktionary.org/")
@@ -27,9 +30,9 @@
     (m/value?  "#firstHeading" "happy")})
 
 (def graph ^:m-graph
-  #{[start search-for-flocci flocci-state]
-    [start search-for-happy  happy-state]})
+  #{[set-up initial search-for-flocci flocci-state]
+    [set-up initial search-for-happy  happy-state]})
 
 (defn -main
   []
-  (m/run graph start))
+  (m/run graph set-up))
