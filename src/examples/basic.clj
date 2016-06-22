@@ -1,17 +1,13 @@
 (ns examples.basic
   (:require [mulefa.core :as m]))
 
-;; attempt v.0.0.2
-
 (def set-up ^:m-transaction
   [(m/navigate "https://www.wiktionary.org/")])
 
 (def initial ^:m-state
-  #{;'(m/url     "https://www.wiktionary.org/")
+  #{(m/url?    "https://www.wiktionary.org/")
     (m/exists? "#searchInput")
-    (m/url?    "https://www.wiktionary.org/")
     (m/value?  "#searchLanguage" "en")})
-
 
 (def search-for-flocci ^:m-transaction
   [(m/fill-in "#searchInput" "floccinaucinihilipilification")
