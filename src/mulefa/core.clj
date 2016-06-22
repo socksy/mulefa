@@ -63,15 +63,12 @@
     (doall (map #(% driver) transition))
     (check-state driver next-state)))
 
-(defn run-route
-  ([arg-list]
-   (println "run route1")
-   (run-route (t/new-driver {:browser :chrome}) arg-list))
-  ([driver [transition next-state & the-rest]]
-   (println "run route2")
-   (run-transition driver transition next-state)
-   (when the-rest
-     (recur driver the-rest))))
+(defn- run-route
+  [driver [transition next-state & the-rest]]
+  (println "run route")
+  (run-transition driver transition next-state)
+  (when the-rest
+    (recur driver the-rest)))
 
 (defn- get-routes
   [graph starting-point]
@@ -79,6 +76,9 @@
   graph)
 
 (defn run
-  [graph starting-point]
-  (->> (get-routes graph starting-point)
-       (run! run-route)))
+  ([graph starting-point]
+   (run (t/new-driver {:browser :chrome}) graph starting-point))
+  ([driver graph starting-point]
+   (->> (get-routes graph starting-point)
+        (run! (partial run-route driver)))
+   (t/close driver)))
