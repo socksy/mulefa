@@ -2,9 +2,6 @@
   (:require [clojure.test :refer :all]
             [mulefa.core :as m]))
 
-(def set-up ^:m-transaction
-  [(m/navigate "https://www.wiktionary.org/")])
-
 (def initial ^:m-state
   #{(m/url?    "https://www.wiktionary.org/")
     (m/exists? "#searchInput")
@@ -19,8 +16,8 @@
     (m/value?  "#firstHeading" "floccinaucinihilipilification")})
 
 (def graph ^:m-graph
-  #{[set-up initial search-for-flocci flocci-state]})
+  #{[initial search-for-flocci flocci-state]})
 
 (deftest test-run
   (testing "traversal of a minimal graph"
-    (is (nil? (m/run graph set-up)))))
+    (is (nil? (m/run graph initial "https://www.wiktionary.org")))))

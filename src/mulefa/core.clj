@@ -55,30 +55,32 @@
   (doall (map #(% driver) state)))
 
 (defn- run-transition
-  [driver transition next-state]
+  [driver state transition]
   ;; TODO get check-state response and fail out properly
   ;; i.e. no more (do)
   (do
     (println "running-transition")
-    (doall (map #(% driver) transition))
-    (check-state driver next-state)))
+    (check-state driver state)
+    (doall (map #(% driver) transition))))
 
 (defn- run-route
-  [driver [transition next-state & the-rest]]
+  [driver [state transition & the-rest]]
   (println "run route")
-  (run-transition driver transition next-state)
+  (run-transition driver state transition)
   (when the-rest
     (recur driver the-rest)))
 
 (defn- get-routes
-  [graph starting-point]
-  ;;TODO actually get possible paths from the graph
-  graph)
+  [graph start-state]
+  ;;TODO actually get possible routes from the graph
+  [(first graph)])
 
 (defn run
-  ([graph starting-point]
-   (run (t/new-driver {:browser :chrome}) graph starting-point))
-  ([driver graph starting-point]
-   (->> (get-routes graph starting-point)
-        (run! (partial run-route driver)))
+  ([graph start-state starting-url]
+   (run (t/new-driver {:browser :chrome}) graph start-state starting-url))
+  ([driver graph start-state starting-url]
+   (->> (get-routes graph start-state)
+        (run! (fn [route]
+                (t/to driver starting-url)
+                (run-route driver route))))
    (t/close driver)))

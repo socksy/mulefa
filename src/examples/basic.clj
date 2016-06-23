@@ -1,9 +1,6 @@
 (ns examples.basic
   (:require [mulefa.core :as m]))
 
-(def set-up ^:m-transaction
-  [(m/navigate "https://www.wiktionary.org/")])
-
 (def initial ^:m-state
   #{(m/url?    "https://www.wiktionary.org/")
     (m/exists? "#searchInput")
@@ -26,9 +23,9 @@
     (m/value?  "#firstHeading" "happy")})
 
 (def graph ^:m-graph
-  #{[set-up initial search-for-flocci flocci-state]
-    [set-up initial search-for-happy  happy-state]})
+  #{[initial search-for-flocci flocci-state]
+    [initial search-for-happy  happy-state]})
 
 (defn -main
   []
-  (m/run graph set-up))
+  (m/run graph initial "https://www.wiktionary.org"))
